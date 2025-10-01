@@ -1,1 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// -------------------- Estrutura da sala --------------------
+typedef struct Sala {
+    char nome[50];
+    struct Sala* esquerda;
+    struct Sala* direita;
+} Sala;
+
+// -------------------- Criar uma sala --------------------
+Sala* criarSala(const char* nome) {
+    Sala* novaSala = (Sala*)malloc(sizeof(Sala));
+    if (novaSala == NULL) {
+        printf("Erro ao alocar memória!\n");
+        exit(1);
+    }
+    strcpy(novaSala->nome, nome);
+    novaSala->esquerda = NULL;
+    novaSala->direita = NULL;
+    return novaSala;
+}
+
+// -------------------- Montar mapa da mansão --------------------
+/**
+ * montarMapa
+ * Cria todas as salas da mansão e conecta os nós.
+ * Retorna o nó raiz (Hall de entrada).
+ */
+Sala* montarMapa() {
+    Sala* hall = criarSala("Hall de entrada");
+    Sala* sala1 = criarSala("Sala de estar");
+    Sala* sala2 = criarSala("Cozinha");
+    Sala* sala3 = criarSala("Biblioteca");
+    Sala* sala4 = criarSala("Jardim");
+    Sala* sala5 = criarSala("Quarto do mestre");
+    Sala* sala6 = criarSala("Porão");
+
+    hall->esquerda = sala1;
+    hall->direita = sala2;
+
+    sala1->esquerda = sala3;
+    sala1->direita = sala4;
+
+    sala2->esquerda = sala5;
+    sala2->direita = sala6;
+
+    return hall; // Retorna o ponto de partida
+}
+
+// -------------------- Explorar salas --------------------
+void explorarSalas(Sala* salaAtual) {
+    if (salaAtual == NULL) return;
+
+    printf("\nVocê entrou na %s.\n", salaAtual->nome);
+
+    if (salaAtual->esquerda == NULL && salaAtual->direita == NULL) {
+        printf("Você chegou a um cômodo sem mais caminhos!\n");
+        return;
+    }
+
+    char escolha;
+    while (1) {
+        printf("Para onde deseja ir? (e = esquerda, d = direita, s = sair): ");
+        scanf(" %c", &escolha);
+
+        if (escolha == 'e' && salaAtual->esquerda != NULL) {
+            explorarSalas(salaAtual->esquerda);
+            break;
+        } else if (escolha == 'd' && salaAtual->direita != NULL) {
+            explorarSalas(salaAtual->direita);
+            break;
+        } else if (escolha == 's') {
+            printf("Exploração encerrada.\n");
+            break;
+        } else {
+            printf("Opção inválida ou caminho não disponível. Tente novamente.\n");
+        }
+    }
+}
+
+// -------------------- Liberar memória do mapa --------------------
+void liberarMapa(Sala* salaAtual) {
+    if (salaAtual == NULL) return;
+    liberarMapa(salaAtual->esquerda);
+    liberarMapa(salaAtual->direita);
+    free(salaAtual);
+}
+
+// -------------------- Função principal --------------------
+int main() {
+    printf("Bem-vindo ao Detective Quest!\n");
+
+    // Monta o mapa
+    Sala* mapa = montarMapa();
+
+    // Inicia exploração
+    explorarSalas(mapa);
+
+    // Libera memória
+    liberarMapa(mapa);
+
+    return 0;
+}
 
